@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>TabaTimer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#0a0a0a;--card:#161616;--card2:#202020;--line:#2c2c2c;--tx:#f5f5f5;--mut:#9a9a9a;--red:#ff1a1f;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) env(safe-area-inset-right) 110px env(safe-area-inset-left)}
+header{display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+header img{width:44px;height:44px;border-radius:11px}
+h1{font-size:26px;margin:0;font-style:italic;font-weight:900;letter-spacing:-.5px}
+h1 b{color:var(--red)}
+main{max-width:760px;margin:0 auto;padding:16px}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer;font-weight:600}
+button:hover{border-color:#555}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+input,select{background:#0f0f0f;border:1px solid var(--line);border-radius:8px;padding:8px 9px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar select{flex:1;min-width:140px}
+.ghost{background:none}
+.sum{display:flex;justify-content:space-between;color:var(--mut);margin:6px 2px 14px;font-size:15px}
+.sum b{color:var(--tx)}
+.serie{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:14px}
+.sh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.sh .sn{flex:1;min-width:130px;font-weight:700}
+.rep{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:14px}
+.rep input{width:62px;text-align:center;font-weight:700;color:var(--tx)}
+.blk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-left:10px solid var(--c);background:var(--card2);border-radius:10px;padding:8px 8px 8px 10px;margin-bottom:8px}
+.blk select{width:140px}
+.blk .lb{flex:1;min-width:110px}
+.dur{display:flex;align-items:center;gap:4px}
+.dur input{width:58px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.blk input[type=color]{width:42px;height:38px;padding:2px;cursor:pointer}
+.ic{padding:6px 9px;font-size:14px}
+.add{width:100%;border-style:dashed;background:none;color:var(--mut)}
+.big{width:100%;font-size:17px;padding:12px;margin-top:4px}
+.mini{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;margin:2px 0 12px}
+.mini i{display:block;min-width:2px}
+footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 35%)}
+footer button{display:block;max-width:728px;margin:0 auto;width:100%;background:var(--red);border:0;color:#fff;font-size:20px;font-weight:800;padding:15px;border-radius:14px}
+#run{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.35);transition:background .25s}
+#run.on{display:flex}
+#run.dark{color:#111;text-shadow:none}
+#run .top{width:100%;display:flex;justify-content:space-between;font-size:clamp(14px,2.6vw,22px);font-weight:600;opacity:.9}
+#run .lab{font-size:clamp(34px,9vw,96px);font-weight:900;font-style:italic;line-height:1}
+#run .t{font-size:min(36vw,52vh);font-weight:900;line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+#run .nx{font-size:clamp(16px,3.2vw,28px);font-weight:600;opacity:.9}
+#run .pg{width:100%;height:10px;background:rgba(0,0,0,.25);border-radius:5px;overflow:hidden}
+#run .pg i{display:block;height:100%;background:currentColor;width:0}
+#run .ctl{display:flex;gap:14px}
+#run .ctl button{background:rgba(0,0,0,.28);border:0;color:inherit;font-size:26px;width:68px;height:60px;border-radius:16px;text-shadow:none}
+#run.dark .ctl button{background:rgba(0,0,0,.14)}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:16px;max-width:420px}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{border:0;border-bottom:4px solid var(--c);background:var(--card2);font-size:13px;padding:7px 10px;border-radius:8px 8px 4px 4px}
+.chip:hover{background:#2a2a2a}
+@keyframes fl{from{box-shadow:0 0 0 3px var(--red)}to{box-shadow:0 0 0 0 transparent}}
+.serie.new{animation:fl 1.4s ease-out}
+.empty{color:var(--mut);text-align:center;padding:10px;font-size:14px}
+@media(max-width:520px){.blk select{width:100%}.blk .lb{min-width:100%}}
+@media(prefers-reduced-motion:reduce){#run{transition:none}}
+</style>
+</head>
+<body>
+<header><img src="icons/icon-192.png" alt=""><h1>Taba<b>Timer</b></h1><span style="flex:1"></span><button id="inst" hidden>Installer</button></header>
+<main>
+ <div class="bar">
+  <select id="sel" aria-label="Séance"></select>
+  <button id="new">Nouvelle</button><button id="dupw">Dupliquer</button><button id="delw" class="ghost">Supprimer</button>
+ </div>
+ <div class="bar">
+  <input id="name" aria-label="Nom de la séance" style="flex:1;font-weight:700;font-size:18px">
+  <button id="exp">Exporter CSV</button><button id="imp">Importer CSV</button><input type="file" id="file" accept=".csv,text/csv" hidden>
+ </div>
+ <div class="mini" id="mini"></div>
+ <div class="sum"><span id="s1"></span><button id="adds2">+ Nouvelle série</button><span>Durée totale <b id="s2"></b></span></div>
+ <div id="series"></div>
+ <button class="add" id="adds">+ Ajouter une série</button>
+</main>
+<footer><button id="go">▶ Lancer la séance</button></footer>
+
+<div id="run" role="dialog" aria-label="Minuteur">
+ <div class="top"><span id="rs"></span><span id="rt"></span></div>
+ <div><div class="lab" id="rl"></div><div class="t" id="rc"></div></div>
+ <div style="width:100%"><div class="nx" id="rn" style="margin-bottom:12px"></div><div class="pg"><i id="rp"></i></div></div>
+ <div class="ctl"><button id="bp" aria-label="Précédent">⏮</button><button id="bpl" aria-label="Pause">⏸</button><button id="bn" aria-label="Suivant">⏭</button><button id="bx" aria-label="Arrêter">✕</button></div>
+</div>
+<dialog id="dlg"><p id="dm" style="margin-top:0"></p><form method="dialog"><button>OK</button></form></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const TYPES={prepa:['Préparation','#14b8a6'],echauf:['Échauffement','#8b5cf6'],travail:['Travail','#16a34a'],recup:['Récupération','#2563eb'],transition:['Transition','#eab308'],repos:['Repos','#f97316'],fc:['Prise de FC','#ec4899'],debrief:['Débrief','#64748b']};
+const DUR={prepa:10,echauf:300,travail:30,recup:30,transition:10,repos:15,fc:49,debrief:120};
+const B=(type,d,label,color)=>({type,d,label:label||TYPES[type][0],color:color||TYPES[type][1]});
+const DEF=()=>[
+ {name:'Step : 4 séries de 6 min',series:[
+  {name:'Échauffement',reps:1,blocks:[B('echauf',300)]},
+  {name:'Séries',reps:3,blocks:[B('travail',360),B('fc',49),B('recup',180)]},
+  {name:'Dernière série',reps:1,blocks:[B('travail',360),B('fc',49)]},
+  {name:'Retour au calme',reps:1,blocks:[B('debrief',180)]}]},
+ {name:'Tabata classique',series:[
+  {name:'Préparation',reps:1,blocks:[B('prepa',10)]},
+  {name:'Tabata',reps:8,blocks:[B('travail',20),B('repos',10)]}]}];
+let S;try{S=JSON.parse(localStorage.getItem('tabatimer'))}catch(e){}
+if(!S||!S.w||!S.w.length)S={cur:0,w:DEF()};
+const W=()=>S.w[S.cur];
+const save=()=>{try{localStorage.setItem('tabatimer',JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(r).padStart(2,'0')};
+const alertBox=m=>{$('dm').textContent=m;$('dlg').showModal()};
+
+function render(){
+ const w=W();
+ $('sel').innerHTML=S.w.map((x,i)=>`<option value="${i}" ${i==S.cur?'selected':''}>${esc(x.name)}</option>`).join('');
+ $('name').value=w.name;
+ $('series').innerHTML=w.series.map((s,si)=>`<section class="serie">
+  <div class="sh"><input class="sn" data-s="${si}" data-f="sname" value="${esc(s.name)}" aria-label="Nom de la série">
+  <label class="rep">Répétitions ×<input type="number" min="1" max="99" data-s="${si}" data-f="reps" value="${s.reps}"></label>
+  <button class="ic" data-a="sup" data-s="${si}" title="Monter">↑</button><button class="ic" data-a="sdn" data-s="${si}" title="Descendre">↓</button>
+  <button class="ic" data-a="sdup" data-s="${si}" title="Dupliquer la série">⧉</button><button class="ic" data-a="sdel" data-s="${si}" title="Supprimer">🗑</button></div>
+  ${s.blocks.map((b,bi)=>`<div class="blk" style="--c:${b.color}">
+   <select data-s="${si}" data-b="${bi}" data-f="type">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k==b.type?'selected':''}>${v[0]}</option>`).join('')}</select>
+   <input class="lb" data-s="${si}" data-b="${bi}" data-f="label" value="${esc(b.label)}" aria-label="Libellé">
+   <span class="dur"><input type="number" min="0" max="999" data-s="${si}" data-b="${bi}" data-f="min" value="${Math.floor(b.d/60)}" aria-label="Minutes">:<input type="number" min="0" max="59" data-s="${si}" data-b="${bi}" data-f="sec" value="${b.d%60}" aria-label="Secondes"></span>
+   <input type="color" data-s="${si}" data-b="${bi}" data-f="color" value="${b.color}" aria-label="Couleur">
+   <button class="ic" data-a="bup" data-s="${si}" data-b="${bi}">↑</button><button class="ic" data-a="bdn" data-s="${si}" data-b="${bi}">↓</button>
+   <button class="ic" data-a="bdup" data-s="${si}" data-b="${bi}">⧉</button><button class="ic" data-a="bdel" data-s="${si}" data-b="${bi}">🗑</button></div>`).join('')}
+  ${s.blocks.length?"":"<div class=empty>Aucun bloc : ajoutez-en un ci-dessous.</div>"}<div class="chips" aria-label="Ajouter un bloc">${Object.entries(TYPES).map(([k,v])=>`<button class="chip" style="--c:${v[1]}" data-a="badd" data-t="${k}" data-s="${si}">+ ${v[0]}</button>`).join("")}</div></section>`).join('');
+ summary();
+}
+function steps(w){const r=[];w.series.forEach(s=>{for(let k=1;k<=s.reps;k++)s.blocks.forEach(b=>{if(b.d>0)r.push({...b,serie:s.name,k,n:s.reps})})});return r}
+function summary(){
+ const st=steps(W()),tot=st.reduce((a,b)=>a+b.d,0);
+ $('s1').textContent=`${W().series.length} série(s) · ${st.length} périodes`;
+ $('s2').textContent=fmt(tot);
+ $('mini').innerHTML=st.map(b=>`<i style="flex:${b.d};background:${b.color}" title="${esc(b.label)}"></i>`).join('');
+ save();
+}
+// édition
+$('series').addEventListener('input',e=>{
+ const t=e.target,f=t.dataset.f;if(!f)return;
+ const s=W().series[t.dataset.s],b=s.blocks[t.dataset.b];
+ if(f=='sname')s.name=t.value;
+ else if(f=='reps')s.reps=Math.max(1,Math.min(99,+t.value||1));
+ else if(f=='label')b.label=t.value;
+ else if(f=='color'){b.color=t.value;t.closest('.blk').style.setProperty('--c',t.value)}
+ else if(f=='min'||f=='sec'){const r=t.closest('.dur').querySelectorAll('input');b.d=Math.max(0,(+r[0].value||0)*60+(+r[1].value||0))}
+ else if(f=='type'){b.type=t.value;b.label=TYPES[t.value][0];b.color=TYPES[t.value][1];render();return}
+ summary();
+});
+const mv=(a,i,d)=>{const j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]]};
+$('series').addEventListener('click',e=>{
+ const t=e.target.closest('[data-a]');if(!t)return;
+ const w=W(),si=+t.dataset.s,bi=+t.dataset.b,s=w.series[si],a=t.dataset.a;
+ if(a=='sup')mv(w.series,si,-1);if(a=='sdn')mv(w.series,si,1);
+ if(a=='sdup')w.series.splice(si+1,0,JSON.parse(JSON.stringify(s)));
+ if(a=='sdel'&&confirm('Supprimer cette série ?'))w.series.splice(si,1);
+ if(a=='badd'){const ty=t.dataset.t||'travail';s.blocks.push(B(ty,DUR[ty]));render();const bl=document.querySelectorAll('.serie')[si].querySelectorAll('.blk');bl[bl.length-1].scrollIntoView({block:'center',behavior:'smooth'});return}
+ if(a=='bup')mv(s.blocks,bi,-1);if(a=='bdn')mv(s.blocks,bi,1);
+ if(a=='bdup')s.blocks.splice(bi+1,0,{...s.blocks[bi]});
+ if(a=='bdel')s.blocks.splice(bi,1);
+ render();
+});
+function addSeries(){
+ W().series.push({name:'Série '+(W().series.length+1),reps:1,blocks:[B('travail',30)]});render();
+ const e=[...document.querySelectorAll('.serie')].pop();e.classList.add('new');e.scrollIntoView({block:'start',behavior:'smooth'});
+ const n=e.querySelector('.sn');n.focus({preventScroll:true});n.select();
+}
+$('adds').onclick=$('adds2').onclick=addSeries;
+$('sel').onchange=e=>{S.cur=+e.target.value;render()};
+$('name').oninput=e=>{W().name=e.target.value;save();$('sel').options[S.cur].text=e.target.value};
+$('new').onclick=()=>{S.w.push({name:'Nouvelle séance',series:[{name:'Série 1',reps:1,blocks:[B('prepa',10),B('travail',30),B('repos',15)]}]});S.cur=S.w.length-1;render()};
+$('dupw').onclick=()=>{const c=JSON.parse(JSON.stringify(W()));c.name+=' (copie)';S.w.push(c);S.cur=S.w.length-1;render()};
+$('delw').onclick=()=>{if(!confirm('Supprimer la séance « '+W().name+' » ?'))return;S.w.splice(S.cur,1);if(!S.w.length)S.w=DEF().slice(1);S.cur=0;render()};
+
+// CSV
+const H='seance;n_serie;nom_serie;repetitions;type;libelle;duree_s;couleur';
+const q=v=>/[;"\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v;
+$('exp').onclick=()=>{
+ const w=W(),rows=[H];
+ w.series.forEach((s,i)=>s.blocks.forEach(b=>rows.push([w.name,i+1,s.name,s.reps,b.type,b.label,b.d,b.color].map(q).join(';'))));
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.join('\r\n')],{type:'text/csv'}));
+ a.download=(w.name.replace(/[^\w\-à-ÿ ]+/g,'').trim()||'seance')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+function parseLine(l,sep){const r=[];let c='',iq=false;for(let i=0;i<l.length;i++){const x=l[i];if(iq){if(x=='"'){if(l[i+1]=='"'){c+='"';i++}else iq=false}else c+=x}else if(x=='"')iq=true;else if(x==sep){r.push(c);c=''}else c+=x}r.push(c);return r}
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=async e=>{
+ const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{
+  const lines=(await f.text()).replace(/^\ufeff/,'').split(/\r?\n/).filter(l=>l.trim());
+  const sep=lines[0].includes(';')?';':',';
+  const ws={};
+  lines.slice(1).forEach(l=>{
+   const [n,ns,sn,rp,ty,lb,d,co]=parseLine(l,sep);
+   const w=ws[n]=ws[n]||{name:n||'Séance importée',series:[],idx:{}};
+   if(!(ns in w.idx)){w.idx[ns]=w.series.length;w.series.push({name:sn||'Série',reps:Math.max(1,+rp||1),blocks:[]})}
+   const type=TYPES[ty]?ty:'travail';
+   w.series[w.idx[ns]].blocks.push({type,label:lb||TYPES[type][0],d:Math.max(0,+d||0),color:/^#[0-9a-f]{6}$/i.test(co)?co:TYPES[type][1]});
+  });
+  const list=Object.values(ws).filter(w=>w.series.length);
+  if(!list.length)throw 0;
+  list.forEach(w=>{delete w.idx;S.w.push(w)});S.cur=S.w.length-list.length;render();
+  alertBox(list.length+' séance(s) importée(s).');
+ }catch(err){alertBox('Fichier CSV non reconnu. Utilisez un fichier exporté depuis TabaTimer.')}
+};
+
+// Minuteur
+let T=null,actx=null,wl=null;
+const beep=(f,d)=>{try{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.4,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.start();o.stop(actx.currentTime+d)}catch(e){}};
+const lum=h=>{const n=parseInt(h.slice(1),16);return(.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255};
+$('go').onclick=async()=>{
+ const st=steps(W());if(!st.length)return alertBox('La séance est vide : ajoutez des blocs avec une durée.');
+ try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}
+ T={st,i:0,paused:false,tot:st.reduce((a,b)=>a+b.d,0),last:-1};
+ $('run').classList.add('on');
+ try{await $('run').requestFullscreen()}catch(e){}
+ try{wl=await navigator.wakeLock.request('screen')}catch(e){}
+ step(0);T.timer=setInterval(tick,100);
+};
+function step(i){
+ if(i>=T.st.length)return end();
+ if(i<0)i=0;
+ const b=T.st[i];T.i=i;T.dur=b.d*1000;T.rem=T.dur;T.end=performance.now()+T.dur;T.last=-1;
+ const r=$('run');r.style.background=b.color;r.classList.toggle('dark',lum(b.color)>.62);
+ $('rl').textContent=b.label;$('rs').textContent=`${b.serie}${b.n>1?' · '+b.k+'/'+b.n:''}`;
+ const nx=T.st[i+1];$('rn').textContent=nx?`Ensuite : ${nx.label} (${fmt(nx.d)})`:'Dernière période';
+ if(i>0)beep(880,.5);if(navigator.vibrate)navigator.vibrate(i?200:0);
+ $('rc').textContent=fmt(b.d);$('rp').style.width='0%';
+ tick();
+}
+function tick(){
+ if(!T||T.paused)return;
+ T.rem=T.end-performance.now();
+ if(T.rem<=0)return step(T.i+1);
+ const s=Math.ceil(T.rem/1000);
+ $('rc').textContent=fmt(s);
+ $('rp').style.width=(100*(1-T.rem/T.dur))+'%';
+ let after=0;for(let j=T.i+1;j<T.st.length;j++)after+=T.st[j].d;
+ $('rt').textContent='Reste '+fmt(after+T.rem/1000);
+ if(s<=3&&s!==T.last&&T.dur>4000){T.last=s;beep(600,.15)}
+}
+function end(){beep(1000,.9);$('rl').textContent='Séance terminée';$('rc').textContent='✔';$('rn').textContent='';clearInterval(T.timer);T.done=true;$('bpl').textContent='⏸'}
+function stop(){if(T)clearInterval(T.timer);T=null;$('run').classList.remove('on');if(document.fullscreenElement)document.exitFullscreen();if(wl){wl.release();wl=null}}
+$('bx').onclick=stop;
+$('bn').onclick=()=>{if(T&&!T.done){const p=T.paused;step(T.i+1);if(p&&T&&!T.done)pause(true)}};
+$('bp').onclick=()=>{if(!T)return;if(T.done){T.done=false;T.timer=setInterval(tick,100)}const p=T.paused;step(T.rem<T.dur-2000?T.i:T.i-1);if(p)pause(true)};
+function pause(force){if(!T||T.done)return;if(force||!T.paused){T.paused=true;T.rem=T.end-performance.now()}else{T.paused=false;T.end=performance.now()+T.rem}$('bpl').textContent=T.paused?'▶':'⏸'}
+$('bpl').onclick=()=>pause();
+document.addEventListener('keydown',e=>{if(!T)return;if(e.code=='Space'){e.preventDefault();pause()}if(e.code=='ArrowRight')$('bn').click();if(e.code=='ArrowLeft')$('bp').click();if(e.code=='Escape')stop()});
+document.addEventListener('fullscreenchange',()=>{});
+
+// PWA
+let ip;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;$('inst').hidden=false});
+$('inst').onclick=async()=>{if(ip){ip.prompt();await ip.userChoice;ip=null;$('inst').hidden=true}};
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+render();
+</script>
+</body>
+</html>
